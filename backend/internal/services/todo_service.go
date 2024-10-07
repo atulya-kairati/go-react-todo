@@ -5,18 +5,26 @@ import (
 	"go-backend/internal/repositories"
 )
 
-func GetAllTodos() []models.Todo {
-	return repositories.GetAllTodos()
+type TodoService struct {
+	Repo repositories.TodoRepository
 }
 
-func AddTodo(todo *models.Todo) {
-	repositories.AddTodo(todo)
+func NewTodoService(repository repositories.TodoRepository) *TodoService {
+	return &TodoService{Repo: repository}
 }
 
-func DeleteTodoByID(id int) error {
-	return repositories.DeleteTodoByID(id)
+func (service *TodoService) GetAllTodos() []models.Todo {
+	return service.Repo.GetAllTodos()
 }
 
-func UpdateTodoByID(id int, updatedTodo *models.Todo) error {
-	return repositories.UpdateTodoByID(id, updatedTodo)
+func (service *TodoService) AddTodo(todo *models.Todo) {
+	service.Repo.AddTodo(todo)
+}
+
+func (service *TodoService) DeleteTodoByID(id int) error {
+	return service.Repo.DeleteTodoByID(id)
+}
+
+func (service *TodoService) UpdateTodoByID(id int, updatedTodo *models.Todo) error {
+	return service.Repo.UpdateTodoByID(id, updatedTodo)
 }

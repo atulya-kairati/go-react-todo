@@ -6,6 +6,9 @@ import (
 	"os"
 
 	"go-backend/internal/handlers"
+	"go-backend/internal/repositories"
+	"go-backend/internal/services"
+	"go-backend/internal/repositories/memory"
 	"go-backend/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -27,18 +30,31 @@ func main() {
 	}
 
 	PORT := os.Getenv("PORT")
+	repoType := os.Getenv("REPO")
 
 	app := fiber.New()
 	app.Use(logger.New())
 
-	app.Get("/todos", handlers.GetTodos)
+	// create handler
+	repo := getRepository(repoType)
+	service := services.NewTodoService(repo)
+	handler := handlers.NewTodoHandler(service)
 
-	app.Post("/todo", handlers.AddTodo)
+	app.Get("/todos", handler.GetTodos)
 
-	app.Delete("/todo/:id", handlers.DeleteTodo)
+	app.Post("/todo", handler.AddTodo)
 
-	app.Patch("/todo/:id", handlers.UpdateTodo)
+	app.Delete("/todo/:id", handler.DeleteTodo)
+
+	app.Patch("/todo/:id", handler.UpdateTodo)
 
 	app.Listen(":" + PORT)
 
+}
+
+func getRepository(repoType string) repositories.TodoRepository {
+	if repoType == "MEMORY" {
+		return memory.NewInMemoryRepository()
+	}
+	return nil
 }
