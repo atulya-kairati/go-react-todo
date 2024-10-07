@@ -9,6 +9,7 @@ import (
 	"go-backend/internal/repositories"
 	"go-backend/internal/services"
 	"go-backend/internal/repositories/memory"
+	"go-backend/internal/repositories/database"
 	"go-backend/internal/models"
 
 	"github.com/gofiber/fiber/v2"
@@ -55,6 +56,15 @@ func main() {
 func getRepository(repoType string) repositories.TodoRepository {
 	if repoType == "MEMORY" {
 		return memory.NewInMemoryRepository()
+	}
+	if repoType == "DB" {
+		dtr, err := database.NewDatabaseTodoRepository()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return dtr
 	}
 	return nil
 }
